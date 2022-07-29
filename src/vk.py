@@ -1,6 +1,5 @@
-from vkbottle.bot import Bot, Message
-from quote import Quote
-from database import Database
+from vkbottle.bot import Message
+from .quote import Quote
 
 from . import db, bot
 
