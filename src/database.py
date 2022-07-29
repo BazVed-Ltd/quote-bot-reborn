@@ -1,5 +1,7 @@
 import pymongo
-from quote import Quote
+
+from .quote import Quote
+
 
 class Database():
     def __init__(self, db_uri: str, db_name: str = "quote_dev"):
