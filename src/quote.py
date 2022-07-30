@@ -15,7 +15,7 @@ import aiohttp
 from PIL import Image
 from hashlib import blake2s
 
-from ... import config
+from . import config
 
 
 ATTACHMENTS_DIR = os.path.abspath(os.path.normcase(config["commands.quote"]["attachments_dir"]))

@@ -1,6 +1,6 @@
 import pymongo
 
-from .commands.quote.quote import Quote
+from .quote import Quote
 
 
 class Database():
