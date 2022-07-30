@@ -15,9 +15,10 @@ import aiohttp
 from PIL import Image
 from hashlib import blake2s
 
+from . import config
 
-# TODO: Нужно будет это либо в конфиг, либо ещё что-то придумать
-ATTACHMENTS_DIR = os.path.abspath(os.path.normcase("./priv"))
+
+ATTACHMENTS_DIR = os.path.abspath(os.path.normcase(config["commands.quote"]["attachments_dir"]))
 QUOTES_VERSION = 1
 
 
