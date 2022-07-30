@@ -25,9 +25,11 @@ QUOTES_VERSION = 1
 # TODO: Не забыть про --deep
 @bp.on.message(text="/сьлржалсч")
 async def save_quote_handler(message: Message):
-    quote = await message_to_dict(message)
-    quote["id"] = db.quotes.count_documents({})
+    quote = await message_to_dict(message)  # TODO: Цитаты с пустым fwd_messages нельзя создавать
+
+    quote["id"] = db.quotes.count_documents({})  # TODO: Сунуть это всё в database.py
     db.quotes.insert_one(quote)
+
     return str(quote["id"])  # TODO: Нужно возвращать ссылку на сайт с цитатой
 
 
@@ -38,16 +40,25 @@ async def message_to_dict(message: Message) -> dict:
     result["from_id"] = message.from_id
     result["version"] = QUOTES_VERSION
 
-    result["fwd_messages"] = [await fwd_message_to_dict(msg) for msg in get_fwd_messages(message)]
+    from_reply = bool(message.reply_message)
+
+    result["fwd_messages"] = [await fwd_message_to_dict(msg, from_reply=from_reply) for msg in get_fwd_messages(message)]
     return result
 
 
-async def fwd_message_to_dict(message: Message) -> dict:
+async def fwd_message_to_dict(message: Message, from_reply=False) -> dict:
+    if from_reply:
+        messages = await bp.api.messages.get_by_id(message_ids=[message.id])
+        message = messages.items[0]
     result = {}
     result["from_id"] = message.from_id
     result["date"] = message.date
     result["text"] = message.text
-    result["fwd_messages"] = [await fwd_message_to_dict(msg) for msg in get_fwd_messages(message)]
+
+    inner_from_reply = bool(message.reply_message)
+
+    result["fwd_messages"] = [await fwd_message_to_dict(msg, from_reply=inner_from_reply) for msg in get_fwd_messages(message)]
+
     result["attachments"] = [await attachment_to_dict(attachment) for attachment in message.attachments]
     return result
 
