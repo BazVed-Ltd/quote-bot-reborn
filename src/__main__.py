@@ -1,10 +1,14 @@
 import os
-
-from vkbottle import load_blueprints_from_package
+import importlib
 
 from . import bot
 
-for bp in load_blueprints_from_package(os.path.normcase("src/commands")):
-    bp.load(bot)
+for command in os.listdir("src/commands"):
+    if command.startswith("_"):
+        continue
+    command = command.removesuffix(".py")
+
+    command = importlib.import_module(f".commands.{command}", "src")
+    command.bp.load(bot)
 
 bot.run_forever()
