@@ -1,4 +1,6 @@
 import configparser
 
-config = configparser.ConfigParser()
-config.read("config.ini")
+def load_config():
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    return config

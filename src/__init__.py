@@ -1,6 +1,5 @@
-from .config import config
-from .database import Database
-from vkbottle.bot import Bot
+from src import database
+from src.config import load_config
 
-bot = Bot(token=config["quote"]["vk_token"])
-db = Database(config["quote"]["mongodb_uri"])
+config = load_config()
+db = database.connect(config["quote"]["mongodb_uri"], config["quote"]["mongodb_db_name"])
