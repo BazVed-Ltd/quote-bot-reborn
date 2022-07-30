@@ -1,11 +1,13 @@
-from vkbottle.bot import Message
-from .quote import Quote
+from vkbottle.bot import Message, Blueprint
+from ..quote import Quote
 
-from . import db, bot
+from .. import db
+
+bp = Blueprint()
 
 
 # TODO: Не забыть про --deep
-@bot.on.message(text="/сьлржалсч")
+@bp.on.message(text="/сьлржалсч")
 async def save_quote_handler(message: Message):
     quote = await Quote.from_message(message)
     db.add_quote(quote)
