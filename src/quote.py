@@ -190,6 +190,8 @@ class Attachment(dict):
                 downloaded = True
             case MessageAttachmentType.STICKER:
                 filepath = get_max_size_photo(attachment.sticker.images).url
+            case MessageAttachmentType.AUDIO_MESSAGE:
+                filepath = attachment.audio_message.link_mp3
             case _:
                 raise TypeError("unsupported attachment type")
 
