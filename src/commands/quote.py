@@ -27,10 +27,15 @@ QUOTES_VERSION = 1
 async def save_quote_handler(message: Message):
     quote = await message_to_dict(message)  # TODO: Цитаты с пустым fwd_messages нельзя создавать
 
-    quote["id"] = db.quotes.count_documents({})  # TODO: Сунуть это всё в database.py
-    db.quotes.insert_one(quote)
+    quote = insert_quote(quote)
 
     return str(quote["id"])  # TODO: Нужно возвращать ссылку на сайт с цитатой
+
+
+def insert_quote(quote):
+    quote["id"] = db.quotes.count_documents({})
+    db.quotes.insert_one(quote)
+    return quote
 
 
 async def message_to_dict(message: Message) -> dict:
