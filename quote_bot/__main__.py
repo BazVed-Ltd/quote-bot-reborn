@@ -6,7 +6,7 @@ from . import config
 
 bot = Bot(token=config["quote"]["vk_token"])
 
-for bp in load_blueprints_from_package(os.path.normcase("src/commands")):
+for bp in load_blueprints_from_package(os.path.normcase("quote_bot/commands")):
     bp.load(bot)
 
 bot.run_forever()

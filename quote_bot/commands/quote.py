@@ -14,9 +14,9 @@ from PIL import Image
 from hashlib import blake2s
 from typing import Tuple
 
-from src import db, config
+from quote_bot import db, config
 
-bp = Blueprint()
+bp = Blueprint("Quotes")
 
 ATTACHMENTS_DIR = os.path.abspath(os.path.normcase(config["commands.quote"]["attachments_dir"]))
 QUOTES_VERSION = 1
