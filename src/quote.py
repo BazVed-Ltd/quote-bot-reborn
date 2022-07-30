@@ -7,6 +7,7 @@ from vkbottle_types.objects import (
     PhotosPhoto as Photo,
     PhotosPhotoSizes as PhotoSizes,
     DocsDoc as Doc,
+    MessagesGraffiti as Graffiti,
 )
 import io
 import os
@@ -181,12 +182,15 @@ class Attachment(dict):
         """Сохраняет ссылки на вложения, при необходимости скачивает вложения"""
         downloaded=False
 
-        match attachment.type:  # TODO: добавить другие типы
+        match attachment.type:
             case MessageAttachmentType.PHOTO: 
                 filepath = await save_photo(attachment.photo)
                 downloaded = True
             case MessageAttachmentType.DOC:
                 filepath = await save_doc(attachment.doc)
+                downloaded = True
+            case MessageAttachmentType.GRAFFITI:
+                filepath = await save_graffiti(attachment.graffiti)
                 downloaded = True
             case MessageAttachmentType.STICKER:
                 filepath = get_max_size_photo(attachment.sticker.images).url
@@ -221,6 +225,13 @@ async def save_doc(doc: Doc) -> str:
     doc_hash = calculate_hash(doc_bytes)
     _, filepath = photo_paths(doc_hash)
     save_file_if_not_exist(filepath, doc_bytes)
+    return filepath
+
+async def save_graffiti(graffiti: Graffiti) -> str:
+    graffiti_bytes = await download_attachment_by_url(graffiti.url)
+    graffiti_hash = calculate_hash(graffiti_bytes)
+    _, filepath = photo_paths(graffiti_hash)
+    save_file_if_not_exist(filepath, graffiti_bytes)
     return filepath
 
 
