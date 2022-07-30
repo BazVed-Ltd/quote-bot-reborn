@@ -6,7 +6,7 @@ from vkbottle_types.objects import (
     MessagesMessageAttachmentType as MessageAttachmentType,
     PhotosPhoto as Photo,
     PhotosPhotoSizes as PhotoSizes,
-    BaseSticker as Sticker,
+    DocsDoc as Doc,
 )
 import io
 import os
@@ -185,6 +185,9 @@ class Attachment(dict):
             case MessageAttachmentType.PHOTO: 
                 filepath = await save_photo(attachment.photo)
                 downloaded = True
+            case MessageAttachmentType.DOC:
+                filepath = await save_doc(attachment.doc)
+                downloaded = True
             case MessageAttachmentType.STICKER:
                 filepath = get_max_size_photo(attachment.sticker.images).url
             case _:
@@ -207,6 +210,15 @@ async def save_photo(photo: Photo) -> str:
     photo_hash = calculate_hash(photo_bytes)
     _, filepath = photo_paths(photo_hash)
     save_file_if_not_exist(filepath, photo_bytes)
+    return filepath
+
+
+async def save_doc(doc: Doc) -> str:
+    # FIXME: Тут, очевидно, правильно сохраняются только гифки и изображения
+    doc_bytes = await download_attachment_by_url(doc.url)
+    doc_hash = calculate_hash(doc_bytes)
+    _, filepath = photo_paths(doc_hash)
+    save_file_if_not_exist(filepath, doc_bytes)
     return filepath
 
 
