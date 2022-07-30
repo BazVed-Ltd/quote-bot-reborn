@@ -16,7 +16,7 @@ from hashlib import blake2s
 
 
 # TODO: Нужно будет это либо в конфиг, либо ещё что-то придумать
-ATTACHMENTS_DIR = "./priv"
+ATTACHMENTS_DIR = os.path.abspath(os.path.normcase("./priv"))
 QUOTES_VERSION = 1
 
 
