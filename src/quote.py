@@ -131,7 +131,7 @@ class Phrase(Quote):
         attachments = []
         for attachment in message.attachments:
             try:
-                attachments.append(await Attachment.download(attachment))
+                attachments.append(await Attachment.from_message(attachment))
             except TypeError:
                 pass
         return await super().from_message(message, attachments=attachments)
@@ -177,13 +177,13 @@ class Attachment(dict):
         }
 
     @classmethod
-    async def download(cls, attachment: MessageAttachment) -> "Attachment":
+    async def from_message(cls, attachment: MessageAttachment) -> "Attachment":
         """Сохраняет ссылки на вложения, при необходимости скачивает вложения"""
         downloaded=False
 
         match attachment.type:  # TODO: добавить другие типы
             case MessageAttachmentType.PHOTO: 
-                filepath = await download_photo(attachment.photo)
+                filepath = await save_photo(attachment.photo)
                 downloaded = True
             case MessageAttachmentType.STICKER:
                 filepath = get_max_size_photo(attachment.sticker.images).url
@@ -201,7 +201,7 @@ class Attachment(dict):
         return cls(**fields)
 
 
-async def download_photo(photo: Photo) -> str:
+async def save_photo(photo: Photo) -> str:
     photo_url = get_max_size_photo(photo.sizes).url
     photo_bytes = await download_attachment_by_url(photo_url)
     photo_hash = calculate_hash(photo_bytes)
