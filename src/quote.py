@@ -5,7 +5,8 @@ from vkbottle_types.objects import (
     MessagesMessageAttachment as MessageAttachment,
     MessagesMessageAttachmentType as MessageAttachmentType,
     PhotosPhoto as Photo,
-    PhotosPhotoSizes as PhotoSizes
+    PhotosPhotoSizes as PhotoSizes,
+    BaseSticker as Sticker,
 )
 import io
 import os
@@ -128,7 +129,7 @@ class Phrase(Quote):
         Загружает вложения и затем вызывает `Quote.from_message`.
         """
         attachments = []
-        for attachment in message.attachments:  # TODO: Добавить другие вложения
+        for attachment in message.attachments:
             try:
                 attachments.append(await Attachment.download(attachment))
             except TypeError:
@@ -150,12 +151,16 @@ class Attachment(dict):
     """Вложения в сообщениях
 
     - `Attachment.clean_fields()` - возвращает используемые поля
-    - `Attachment.download()` - главная функция, загружает и сохраняет вложение 
+    - `Attachment.download()` - главная функция, загружает и сохраняет вложение
+
+    Поле `filepath`, в зависимости от `downloaded` может хранить либо ссылку на сервер ВК,
+    либо путь к локальному файлу.
     """
-    required_fields = "type filename".split()
+    required_fields = "type filepath downloaded".split()
 
     type: str
-    filename: str
+    filepath: str
+    downloaded: bool
 
     def __init__(self, **kwargs) -> None:
         self.__dict__.update(**kwargs)
@@ -168,25 +173,27 @@ class Attachment(dict):
         """Возвращает используемые поля"""
         return {
             "type": self.type,
-            "filename": self.filename,
+            "fielpath": self.filepath,
         }
 
     @classmethod
     async def download(cls, attachment: MessageAttachment) -> "Attachment":
-        """Загружает картинку и заполняет filename
+        """Сохраняет ссылки на вложения, при необходимости скачивает вложения"""
+        downloaded=False
 
-        Сейчас сохраняет только картинки по пути ATTACHMENTS_DIR/photo_name.webp.
-        """
         match attachment.type:  # TODO: добавить другие типы
-            case MessageAttachmentType.PHOTO:
-                filename = await download_photo(attachment.photo)
+            case MessageAttachmentType.PHOTO: 
+                filepath = await download_photo(attachment.photo)
+                downloaded = True
+            case MessageAttachmentType.STICKER:
+                filepath = get_max_size_photo(attachment.sticker.images).url
             case _:
                 raise TypeError("unsupported attachment type")
 
         all_fields = attachment.__dict__
         # Enum не подходит, переводим в строку
         all_fields.update(type=attachment.type.name.lower())
-        return cls(filename=filename, **all_fields)
+        return cls(filepath=filepath, downloaded=downloaded, **all_fields)
 
     @classmethod
     def from_dict(cls, fields: dict) -> "Attachment":
@@ -198,9 +205,9 @@ async def download_photo(photo: Photo) -> str:
     photo_url = get_max_size_photo(photo.sizes).url
     photo_bytes = await download_attachment_by_url(photo_url)
     photo_hash = calculate_hash(photo_bytes)
-    filename, filepath = photo_paths(photo_hash)
+    _, filepath = photo_paths(photo_hash)
     save_file_if_not_exist(filepath, photo_bytes)
-    return filename
+    return filepath
 
 
 def get_max_size_photo(sizes: list[PhotoSizes]) -> PhotoSizes:
