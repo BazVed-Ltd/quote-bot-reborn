@@ -9,7 +9,7 @@ class CommandRule(base.CommandRule):
     """
     async def check(self, event: Message) -> Union[dict, bool]:
         for prefix in self.prefixes:
-            if self.args_count < 0 and event.text.startswith(prefix + self.command_text + " "):
+            if self.args_count < 0 and event.text.startswith(prefix + self.command_text):
                 return True
             if self.args_count == 0 and event.text == prefix + self.command_text:
                 return True
@@ -27,7 +27,7 @@ class NameArguments(ABCRule[Message]):
     def __init__(self, *args) -> None:
         self.variables = [*args]
 
-    async def check(self, event: Message) -> bool:
+    async def check(self, event: Message) -> dict:
         result = {}
         words = event.text.split(" ")
         for word_index in range(len(words)):
