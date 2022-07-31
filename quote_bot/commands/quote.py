@@ -15,7 +15,8 @@ from hashlib import blake2s
 from typing import Tuple
 
 from quote_bot.rules import NameArguments, CommandRule
-from quote_bot import db, config
+from quote_bot import config
+from quote_bot.database import quotes as quotes_db
 
 bp = Blueprint("Quotes")
 
@@ -34,15 +35,18 @@ async def save_quote_handler(message: Message, deep: str, d: str):
 
     quote = await message_to_dict(message, deep=quote_deep)  # TODO: Цитаты с пустым fwd_messages нельзя создавать
 
-    quote = insert_quote(quote)
+    quote = quotes_db.insert_quote(quote)
 
     return str(quote["id"])  # TODO: Нужно возвращать ссылку на сайт с цитатой
 
+# TODO: Реализовать как в оригинале. На данный момент нужен для разработки
 
-def insert_quote(quote):
-    quote["id"] = db.quotes.count_documents({})
-    db.quotes.insert_one(quote)
-    return quote
+
+@bp.on.message(NameArguments("j"), CommandRule("сь", ["/"], -1))
+async def save_quote_handler(message: Message, j=None):
+    if j:
+        return str(quotes_db.get_quote_by_id(int(j)))
+    return "Ещё не готово, используй -j"
 
 
 async def message_to_dict(message: Message, deep: int = -1) -> dict:
