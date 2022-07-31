@@ -14,6 +14,7 @@ from PIL import Image
 from hashlib import blake2s
 from typing import Tuple
 
+from quote_bot.rules import NameArguments, CommandRule
 from quote_bot import db, config
 
 bp = Blueprint("Quotes")
@@ -22,10 +23,16 @@ ATTACHMENTS_DIR = os.path.abspath(os.path.normcase(config["commands.quote"]["att
 QUOTES_VERSION = 1
 
 
-# TODO: Не забыть про --deep
-@bp.on.message(text="/сьлржалсч")
-async def save_quote_handler(message: Message):
-    quote = await message_to_dict(message)  # TODO: Цитаты с пустым fwd_messages нельзя создавать
+@bp.on.message(NameArguments("deep", "d"), CommandRule("сьлржалсч", ["/"], -1))
+async def save_quote_handler(message: Message, deep: str, d: str):
+    try:
+        quote_deep = int(deep or d or -1)
+        if not (quote_deep >= 0 or quote_deep == -1):
+            raise ValueError
+    except ValueError:
+        return "Глубинность должна быть ЧИСЛОМ >= 0 или -1"
+
+    quote = await message_to_dict(message, deep=quote_deep)  # TODO: Цитаты с пустым fwd_messages нельзя создавать
 
     quote = insert_quote(quote)
 
@@ -38,7 +45,7 @@ def insert_quote(quote):
     return quote
 
 
-async def message_to_dict(message: Message) -> dict:
+async def message_to_dict(message: Message, deep: int = -1) -> dict:
     result = {}
     result["date"] = message.date
     result["peer_id"] = message.peer_id
@@ -47,11 +54,11 @@ async def message_to_dict(message: Message) -> dict:
 
     from_reply = bool(message.reply_message)
 
-    result["fwd_messages"] = [await fwd_message_to_dict(msg, from_reply=from_reply) for msg in get_fwd_messages(message)]
+    result["fwd_messages"] = [await fwd_message_to_dict(msg, from_reply=from_reply, deep=deep) for msg in get_fwd_messages(message)]
     return result
 
 
-async def fwd_message_to_dict(message: Message, from_reply=False) -> dict:
+async def fwd_message_to_dict(message: Message, from_reply=False, deep: int = -1) -> dict:
     if from_reply:
         messages = await bp.api.messages.get_by_id(message_ids=[message.id])
         message = messages.items[0]
@@ -62,7 +69,10 @@ async def fwd_message_to_dict(message: Message, from_reply=False) -> dict:
 
     inner_from_reply = bool(message.reply_message)
 
-    result["fwd_messages"] = [await fwd_message_to_dict(msg, from_reply=inner_from_reply) for msg in get_fwd_messages(message)]
+    if deep != 0:
+        result["fwd_messages"] = [await fwd_message_to_dict(msg, from_reply=inner_from_reply, deep=deep-1) for msg in get_fwd_messages(message)]
+    else:
+        result["fwd_messages"] = []
 
     result["attachments"] = [await attachment_to_dict(attachment) for attachment in message.attachments]
     return result
