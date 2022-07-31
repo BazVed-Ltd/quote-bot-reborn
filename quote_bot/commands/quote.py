@@ -32,8 +32,11 @@ async def save_quote_handler(message: Message, deep: str, d: str):
             raise ValueError
     except ValueError:
         return "Глубинность должна быть ЧИСЛОМ >= 0 или -1"
+    
+    if not message.fwd_messages and not message.reply_message:
+        return "И че сохранить-то надо"
 
-    quote = await message_to_dict(message, deep=quote_deep)  # TODO: Цитаты с пустым fwd_messages нельзя создавать
+    quote = await message_to_dict(message, deep=quote_deep)
 
     quote = quotes_db.insert_quote(quote)
 
