@@ -119,26 +119,24 @@ async def attachment_to_dict(attachment: MessageAttachment) -> dict:
 async def save_photo(photo: Photo) -> str:
     photo_url = get_max_size_photo(photo.sizes).url
     photo_bytes = await download_attachment_by_url(photo_url)
-    photo_hash = calculate_hash(photo_bytes)
-    _, filepath = photo_paths(photo_hash)
-    save_file_if_not_exist(filepath, photo_bytes)
-    return filepath
+    return save_attachment_bytes_to_disk(photo_bytes)
 
 
 async def save_doc(doc: Doc) -> str:
     # FIXME: Тут, очевидно, правильно сохраняются только гифки и изображения
     doc_bytes = await download_attachment_by_url(doc.url)
-    doc_hash = calculate_hash(doc_bytes)
-    _, filepath = photo_paths(doc_hash)
-    save_file_if_not_exist(filepath, doc_bytes)
-    return filepath
+    return save_attachment_bytes_to_disk(doc_bytes)
 
 
 async def save_graffiti(graffiti: Graffiti) -> str:
     graffiti_bytes = await download_attachment_by_url(graffiti.url)
-    graffiti_hash = calculate_hash(graffiti_bytes)
-    _, filepath = photo_paths(graffiti_hash)
-    save_file_if_not_exist(filepath, graffiti_bytes)
+    return save_attachment_bytes_to_disk(graffiti_bytes)
+
+
+def save_attachment_bytes_to_disk(att_bytes: bytes) -> str:
+    att_hash = calculate_hash(att_bytes)
+    _, filepath = photo_paths(att_hash)
+    save_file_if_not_exist(filepath, att_bytes)
     return filepath
 
 
