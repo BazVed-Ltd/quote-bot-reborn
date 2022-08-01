@@ -7,6 +7,7 @@ from vkbottle_types.objects import (
     DocsDoc as Doc,
     MessagesGraffiti as Graffiti,
 )
+from vkbottle.dispatch.rules.base import RegexRule
 import io
 import os
 import aiohttp
@@ -14,7 +15,7 @@ from PIL import Image
 from hashlib import blake2s
 from typing import Tuple
 
-from quote_bot.rules import NameArguments, CommandRule
+from quote_bot.rules import NameArguments
 from quote_bot.database import quotes as quotes_db
 
 bp = Blueprint("Quotes")
@@ -23,7 +24,7 @@ ATTACHMENTS_DIR = "attachments"
 QUOTES_VERSION = 1
 
 
-@bp.on.message(NameArguments("deep", "d"), CommandRule("сьлржалсч", ["/"], -1))
+@bp.on.message(NameArguments("deep", "d"), RegexRule("^/сьлржалсч"))
 async def save_quote_handler(message: Message, deep: str, d: str):
     try:
         quote_deep = int(deep or d or -1)
@@ -44,7 +45,7 @@ async def save_quote_handler(message: Message, deep: str, d: str):
 # TODO: Реализовать как в оригинале. На данный момент нужен для разработки
 
 
-@bp.on.message(NameArguments("j"), CommandRule("сь", ["/"], -1))
+@bp.on.message(NameArguments("j"), RegexRule("^/сь"))
 async def save_quote_handler(message: Message, j=None):
     if j:
         return str(quotes_db.get_quote_by_id(int(j)))
