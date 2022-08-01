@@ -6,8 +6,6 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=mongodb
       - MONGO_INITDB_ROOT_PASSWORD=mongodb
-  redis:
-    image: redis:7
   quote-bot:
     env_file: config.env
     build: .
