@@ -15,12 +15,11 @@ from hashlib import blake2s
 from typing import Tuple
 
 from quote_bot.rules import NameArguments, CommandRule
-from quote_bot import config
 from quote_bot.database import quotes as quotes_db
 
 bp = Blueprint("Quotes")
 
-ATTACHMENTS_DIR = os.path.abspath(os.path.normcase(config["commands.quote"]["attachments_dir"]))
+ATTACHMENTS_DIR = "attachments"
 QUOTES_VERSION = 1
 
 
