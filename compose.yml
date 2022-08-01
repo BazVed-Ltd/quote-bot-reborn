@@ -1,10 +1,6 @@
-version: '3.9'
-
 services:
   mongodb:
     image: mongo:5.0
-    ports:
-      - 27017:27017
     volumes:
       - mongodb-data:/data/db
     environment:
@@ -12,8 +8,12 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=mongodb
   redis:
     image: redis:7
-    ports:
-      - 6379:6379
+  quote-bot:
+    env_file: config.env
+    build: .
+    volumes:
+    - attachments:/usr/src/app/attachments/
 
 volumes:
   mongodb-data:
+  attachments:

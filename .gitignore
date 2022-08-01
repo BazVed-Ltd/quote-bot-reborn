@@ -1,5 +1,5 @@
 priv/
-config.ini
+config.env
 
 #==================== PYTHON ====================
 # Byte-compiled / optimized / DLL files
