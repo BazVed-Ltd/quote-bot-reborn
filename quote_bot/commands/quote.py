@@ -64,6 +64,7 @@ async def save_quote_handler(message: Message, deep: str, d: str):
 
     return str(quote["id"])  # TODO: Нужно возвращать ссылку на сайт с цитатой
 
+
 @bp.on.message(NameArguments("j", "d"), command_regex("сь"))
 async def get_quote_handler(message: Message, j, d):
     # TODO: Реализовать как в оригинале. На данный момент нужен для разработки.
@@ -73,6 +74,7 @@ async def get_quote_handler(message: Message, j, d):
             return "ИндексОшибка: индекс списка вышел из области"
         return str(quote)
     return "Ещё не готово, используй -j"
+
 
 @bp.on.message(command_regex("сьдел"))
 async def delete_quote_handler(message: Message):
