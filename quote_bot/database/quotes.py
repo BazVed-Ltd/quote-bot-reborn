@@ -1,3 +1,4 @@
+import pymongo
 from typing import List
 
 from quote_bot import db
@@ -11,6 +12,23 @@ async def insert_quote(quote: dict) -> dict:
 
 async def get_quote_by_id(id: int) -> dict:
     return await db.quotes.find_one({"id": id})
+
+
+async def delete_quote_by_id(id: int):
+    last_quote = await get_last_quote()
+
+    if id < 0:
+        id = last_quote["id"] + id + 1
+
+    if last_quote["id"] == id:
+        await db.quotes.delete_one({"_id": last_quote["_id"]})
+        return
+    else:
+        await db.quotes.update_one({"id": id}, {'$set': {'deleted': True}})
+
+
+async def get_last_quote() -> dict:
+    return await db.quotes.find_one(sort=[("id", pymongo.DESCENDING)])
 
 
 async def get_unique_ids() -> List[int]:
