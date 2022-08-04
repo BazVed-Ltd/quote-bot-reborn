@@ -5,7 +5,7 @@ from quote_bot import db
 
 
 async def insert_quote(quote: dict) -> dict:
-    quote["id"] = await db.quotes.count_documents({})  # FIXME при удалении цитат айдишники будут неправильные
+    quote["id"] = await db.quotes.count_documents({})
     await db.quotes.insert_one(quote)
     return quote
 
