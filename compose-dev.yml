@@ -8,10 +8,6 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=mongodb
       - MONGO_INITDB_ROOT_PASSWORD=mongodb
-  redis:
-    image: redis:7
-    ports:
-      - 6379:6379
 
 volumes:
   mongodb-data:
