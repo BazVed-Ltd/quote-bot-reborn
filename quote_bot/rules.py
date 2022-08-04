@@ -13,7 +13,7 @@ class NameArguments(ABCRule[Message]):
             word = words[word_index]
             word = word.removeprefix("-").removeprefix("—")
             if word in self.variables:
-                result[word] = words[word_index+1] if word_index+1 < len(words) else None
+                result[word] = words[word_index + 1] if word_index + 1 < len(words) else None
         for var in self.variables:
             if var not in result:
                 result[var] = None
