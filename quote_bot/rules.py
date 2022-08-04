@@ -54,7 +54,7 @@ class Argument():
                 continue
             word = word.removeprefix("-").removeprefix("—")
             if word == self.shortname or word == self.name:
-                return words[word_index+1]
+                return words[word_index + 1]
         return None
 
     def get_value(self, text: str) -> dict:
