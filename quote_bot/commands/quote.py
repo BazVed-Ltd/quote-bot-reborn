@@ -10,6 +10,7 @@ bp = Blueprint("Quotes")
 
 QUOTES_VERSION = 1
 
+
 async def message_to_dict(message: Message, deep: int = -1) -> dict:
     result = {}
     result["date"] = message.date
@@ -35,7 +36,7 @@ async def fwd_message_to_dict(message: Message, from_reply=False, deep: int = -1
     inner_from_reply = bool(message.reply_message)
 
     if deep != 0:
-        result["fwd_messages"] = [await fwd_message_to_dict(msg, from_reply=inner_from_reply, deep=deep-1) for msg in get_fwd_messages(message)]
+        result["fwd_messages"] = [await fwd_message_to_dict(msg, from_reply=inner_from_reply, deep=deep - 1) for msg in get_fwd_messages(message)]
     else:
         result["fwd_messages"] = []
 
@@ -71,4 +72,3 @@ async def save_quote_handler(message: Message, j=None):
     if j:
         return str(await quotes_db.get_quote_by_id(int(j)))
     return "Ещё не готово, используй -j"
-

@@ -14,6 +14,7 @@ bp = Blueprint("DatabaseCache")
 
 logger = logging.getLogger("db_cache")
 
+
 async def users_groups_get(ids: List[int]) -> List[SimpleNamespace]:
     group_ids = []
     user_ids = []
@@ -43,6 +44,7 @@ async def users_groups_get(ids: List[int]) -> List[SimpleNamespace]:
                                           is_user=False))
     return users + groups
 
+
 async def update():
     prev_state = await db.cache_state.find_one()
     unique_ids = set(await get_unique_ids())
@@ -56,6 +58,7 @@ async def update():
             "name": user.name,
             "pic": pic_filepath
         })
+
 
 async def daily_recache():
     prev_state = await db.cache_state.find_one()
