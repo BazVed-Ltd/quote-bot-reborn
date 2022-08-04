@@ -1,4 +1,4 @@
-name: autopep8
+name: Format python code
 on: pull_request
 jobs:
   autopep8:
@@ -19,6 +19,6 @@ jobs:
         if: steps.autopep8.outputs.exit-code == 2
         run: |
           git config --global user.name 'Evgeniy Rybin'
-          git config --global user.email 'z.ribin@gmail.com'
+          git config --global user.email 'z.ribin20@gmail.com'
           git commit -am "Автоматическое autopep8 форматирование"
           git push
