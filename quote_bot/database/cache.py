@@ -1,6 +1,6 @@
 import asyncio
 from types import SimpleNamespace
-from typing import List, Dict, Union
+from typing import List
 from os import remove
 import logging
 
@@ -44,34 +44,34 @@ async def users_groups_get(ids: List[int]) -> List[SimpleNamespace]:
     return users + groups
 
 async def update():
-    prev_state = db.cache_state.find_one()
-    unique_ids = set(get_unique_ids())
+    prev_state = await db.cache_state.find_one()
+    unique_ids = set(await get_unique_ids())
     new_ids = unique_ids - set(prev_state["unique_ids"])
     new_users = await users_groups_get(new_ids)
     for user in new_users:
         pic_bytes = await download_attachment_by_url(user.photo_200)
         pic_filepath = save_attachment_bytes_to_disk(pic_bytes)
-        db.cache.insert_one({
+        await db.cache.insert_one({
             "id": user.id,
             "name": user.name,
             "pic": pic_filepath
         })
 
 async def daily_recache():
-    prev_state = db.cache_state.find_one()
+    prev_state = await db.cache_state.find_one()
     if prev_state is None:
         prev_state = {"last_checked": 0, "unique_ids": []}
-        db.cache_state.insert_one(prev_state)
+        await db.cache_state.insert_one(prev_state)
     while True:
         logger.info("Running full recache...")
-        users = dict([(user.id, {"name": user.name, "photo_200": user.photo_200}) for user in await users_groups_get(get_unique_ids())])
+        users = dict([(user.id, {"name": user.name, "photo_200": user.photo_200}) for user in await users_groups_get(await get_unique_ids())])
         for user in users:
-            user_in_db = dict(db.cache.find_one({"id": user}))
+            user_in_db = dict(await db.cache.find_one({"id": user}))
             user_in_db["name"] = users[user]["name"]
             pic_bytes = await download_attachment_by_url(users[user]["photo_200"])
             pic = save_attachment_bytes_to_disk(pic_bytes)
             if user_in_db["pic"] != pic:
                 remove(user_in_db["pic"])
                 user_in_db["pic"] = pic
-            db.cache.replace_one({"id": user}, user_in_db)
+            await db.cache.replace_one({"id": user}, user_in_db)
         await asyncio.sleep(86_400)

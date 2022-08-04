@@ -1,9 +1,9 @@
-import pymongo
+import motor.motor_asyncio as aiomotor
 import signal
 import sys
 
 def connect(db_uri: str, db_name: str):
-    client = pymongo.MongoClient(db_uri)
+    client = aiomotor.AsyncIOMotorClient(db_uri)
     def disconnect(sig, frame):
         client.close()
         sys.exit(0)

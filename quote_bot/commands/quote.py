@@ -57,7 +57,7 @@ async def save_quote_handler(message: Message, deep: str, d: str):
 
     quote = await message_to_dict(message, deep=quote_deep)
 
-    quote = quotes_db.insert_quote(quote)
+    quote = await quotes_db.insert_quote(quote)
 
     await db_cache.update()
 
@@ -69,6 +69,6 @@ async def save_quote_handler(message: Message, deep: str, d: str):
 @bp.on.message(NameArguments("j"), RegexRule("^/сь"))
 async def save_quote_handler(message: Message, j=None):
     if j:
-        return str(quotes_db.get_quote_by_id(int(j)))
+        return str(await quotes_db.get_quote_by_id(int(j)))
     return "Ещё не готово, используй -j"
 
