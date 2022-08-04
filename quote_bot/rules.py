@@ -8,6 +8,7 @@ def command_regex(command: str) -> RegexRule:
 
 
 class NameArguments(ABCRule[Message]):
+    # TODO Переписать эту рулзу, чтобы с флагами и нормальными именами
     def __init__(self, *args) -> None:
         self.variables = [*args]
 

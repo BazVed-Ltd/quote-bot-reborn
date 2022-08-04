@@ -64,11 +64,22 @@ async def save_quote_handler(message: Message, deep: str, d: str):
 
     return str(quote["id"])  # TODO: Нужно возвращать ссылку на сайт с цитатой
 
-# TODO: Реализовать как в оригинале. На данный момент нужен для разработки
-
-
-@bp.on.message(NameArguments("j"), command_regex("сь"))
-async def save_quote_handler(message: Message, j=None):
+@bp.on.message(NameArguments("j", "d"), command_regex("сь"))
+async def get_quote_handler(message: Message, j, d):
+    # TODO: Реализовать как в оригинале. На данный момент нужен для разработки.
     if j:
-        return str(await quotes_db.get_quote_by_id(int(j)))
+        quote = await quotes_db.get_quote_by_id(int(j))
+        if not quote or quote.get("deleted", False) and not d:
+            return "ИндексОшибка: индекс списка вышел из области"
+        return str(quote)
     return "Ещё не готово, используй -j"
+
+@bp.on.message(command_regex("сьдел"))
+async def delete_quote_handler(message: Message):
+    args = message.text.split()[1:]
+    if len(args) != 1:
+        return "Спок, нужен только ОДИН аргумент - айди цитаты"
+    quote_id = int(args[0])
+
+    await quotes_db.delete_quote_by_id(quote_id)
+    return "Понял"
