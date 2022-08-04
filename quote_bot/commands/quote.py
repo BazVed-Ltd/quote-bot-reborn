@@ -51,7 +51,7 @@ async def save_quote_handler(message: Message, deep: str, d: str):
             raise ValueError
     except ValueError:
         return "Глубинность должна быть ЧИСЛОМ >= 0 или -1"
-    
+
     if not message.fwd_messages and not message.reply_message:
         return "И че сохранить-то надо"
 

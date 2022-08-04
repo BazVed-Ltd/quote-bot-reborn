@@ -44,7 +44,7 @@ async def users_groups_get(ids: List[int]) -> List[SimpleNamespace]:
     return users + groups
 
 async def update():
-    prev_state = db.cache_state.find_one()    
+    prev_state = db.cache_state.find_one()
     unique_ids = set(get_unique_ids())
     new_ids = unique_ids - set(prev_state["unique_ids"])
     new_users = await users_groups_get(new_ids)
