@@ -5,7 +5,7 @@ from vkbottle.bot import Bot
 from . import config
 from .database.cache import bp as db_cache_bp, daily_recache
 
-bot = Bot(token=config["quote"]["vk_token"])
+bot = Bot(token=config["vk_token"])
 
 for bp in load_blueprints_from_package(os.path.normcase("quote_bot/commands")):
     bp.load(bot)
