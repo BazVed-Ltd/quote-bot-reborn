@@ -1,7 +1,7 @@
 from vkbottle.bot import Message, Blueprint
 from vkbottle.dispatch.rules.base import RegexRule
 
-from quote_bot.rules import NameArguments
+from quote_bot.rules import NameArguments, command_regex
 from quote_bot.database import quotes as quotes_db
 from quote_bot.database import cache as db_cache
 from quote_bot.utils import *
@@ -44,7 +44,7 @@ async def fwd_message_to_dict(message: Message, from_reply=False, deep: int = -1
     return result
 
 
-@bp.on.message(NameArguments("deep", "d"), RegexRule("^/сьлржалсч"))
+@bp.on.message(NameArguments("deep", "d"), command_regex("сьлржалсч"))
 async def save_quote_handler(message: Message, deep: str, d: str):
     try:
         quote_deep = int(deep or d or -1)
@@ -67,7 +67,7 @@ async def save_quote_handler(message: Message, deep: str, d: str):
 # TODO: Реализовать как в оригинале. На данный момент нужен для разработки
 
 
-@bp.on.message(NameArguments("j"), RegexRule("^/сь"))
+@bp.on.message(NameArguments("j"), command_regex("сь"))
 async def save_quote_handler(message: Message, j=None):
     if j:
         return str(await quotes_db.get_quote_by_id(int(j)))

@@ -1,5 +1,10 @@
 from vkbottle.bot import Message
 from vkbottle.dispatch.rules import ABCRule
+from vkbottle.dispatch.rules.base import RegexRule
+
+
+def command_regex(command: str) -> RegexRule:
+    return RegexRule(fr"^/{command}(?!\S)")
 
 
 class NameArguments(ABCRule[Message]):
