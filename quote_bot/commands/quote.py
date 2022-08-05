@@ -1,7 +1,7 @@
+from typing import Optional
 from vkbottle.bot import Message, Blueprint
-from vkbottle.dispatch.rules.base import RegexRule
 
-from quote_bot.rules import NameArguments, command_regex
+from quote_bot.rules import NamedArguments, Argument, command_regex
 from quote_bot.database import quotes as quotes_db
 from quote_bot.database import cache as db_cache
 from quote_bot.utils import *
@@ -44,10 +44,16 @@ async def fwd_message_to_dict(message: Message, from_reply=False, deep: int = -1
     return result
 
 
-@bp.on.message(NameArguments("deep", "d"), command_regex("сьлржалсч"))
-async def save_quote_handler(message: Message, deep: str, d: str):
+@bp.on.message(
+    command_regex("сьлржалсч"),
+    NamedArguments(
+        Argument(name="deep", shortname="d"),
+        Argument(name="глубинность", shortname="г", in_command_name="deep")
+    )
+)
+async def save_quote_handler(message: Message, deep: Optional[str] = None):
     try:
-        quote_deep = int(deep or d or -1)
+        quote_deep = int(deep or -1)
         if not (quote_deep >= 0 or quote_deep == -1):
             raise ValueError
     except ValueError:
@@ -65,15 +71,21 @@ async def save_quote_handler(message: Message, deep: str, d: str):
     return str(quote["id"])  # TODO: Нужно возвращать ссылку на сайт с цитатой
 
 
-@bp.on.message(NameArguments("j", "d"), command_regex("сь"))
-async def get_quote_handler(message: Message, j, d):
+@bp.on.message(
+    command_regex("сь"),
+    NamedArguments(
+        Argument(name="dev", shortname="d"),
+        Argument(name="deleted", shortname="D", is_flag=True)
+    )
+)
+async def get_quote_handler(message: Message, dev: Optional[str] = None, deleted: Optional[bool] = False):
     # TODO: Реализовать как в оригинале. На данный момент нужен для разработки.
-    if j:
-        quote = await quotes_db.get_quote_by_id(int(j))
-        if not quote or quote.get("deleted", False) and not d:
+    if dev:
+        quote = await quotes_db.get_quote_by_id(int(dev))
+        if not quote or quote.get("deleted", False) and not deleted:
             return "ИндексОшибка: индекс списка вышел из области"
         return str(quote)
-    return "Ещё не готово, используй -j"
+    return "Ещё не готово, используй -d"
 
 
 @bp.on.message(command_regex("сьдел"))
