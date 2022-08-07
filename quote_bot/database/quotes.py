@@ -5,17 +5,21 @@ from quote_bot import db
 
 
 async def insert_quote(quote: dict) -> dict:
-    quote["id"] = await db.quotes.count_documents({})
+    quote["id"] = await calculate_next_id(quote)
     await db.quotes.insert_one(quote)
     return quote
 
 
-async def get_quote_by_id(id: int) -> dict:
-    return await db.quotes.find_one({"id": id})
+async def calculate_next_id(quote: dict) -> int:
+    return await db.quotes.count_documents({"peer_id": quote["peer_id"]})
 
 
-async def delete_quote_by_id(id: int):
-    last_quote = await get_last_quote()
+async def get_quote_by_id(peer_id: int, id: int) -> dict:
+    return await db.quotes.find_one({"peer_id": peer_id, "id": id})
+
+
+async def delete_quote_by_id(peer_id: int, id: int):
+    last_quote = await get_last_quote(peer_id)
 
     if id < 0:
         id = last_quote["id"] + id + 1
@@ -24,11 +28,11 @@ async def delete_quote_by_id(id: int):
         await db.quotes.delete_one({"_id": last_quote["_id"]})
         return
     else:
-        await db.quotes.update_one({"id": id}, {'$set': {'deleted': True}})
+        await db.quotes.update_one({"id": id, "peer_id": peer_id}, {'$set': {'deleted': True}})
 
 
-async def get_last_quote() -> dict:
-    return await db.quotes.find_one(sort=[("id", pymongo.DESCENDING)])
+async def get_last_quote(peer_id: int) -> dict:
+    return await db.quotes.find_one({"peer_id": peer_id}, sort=[("id", pymongo.DESCENDING)])
 
 
 async def get_unique_ids() -> List[int]:
