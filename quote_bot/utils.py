@@ -19,6 +19,10 @@ from vkbottle_types.objects import (
 ATTACHMENTS_DIR = "attachments"
 
 
+class CommandArgumentError(Exception):
+    pass
+
+
 def get_fwd_messages(message: Message) -> list[Message]:
     if message.fwd_messages:
         return message.fwd_messages
