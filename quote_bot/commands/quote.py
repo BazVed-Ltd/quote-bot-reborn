@@ -81,7 +81,7 @@ async def save_quote_handler(message: Message, deep: Optional[str] = None):
 async def get_quote_handler(message: Message, dev: Optional[str] = None, deleted: Optional[bool] = False):
     # TODO: Реализовать как в оригинале. На данный момент нужен для разработки.
     if dev:
-        quote = await quotes_db.get_quote_by_id(int(dev))
+        quote = await quotes_db.get_quote_by_id(message.peer_id, int(dev))
         if not quote or quote.get("deleted", False) and not deleted:
             return "ИндексОшибка: индекс списка вышел из области"
         return str(quote)
@@ -95,5 +95,5 @@ async def delete_quote_handler(message: Message):
         return "Спок, нужен только ОДИН аргумент - айди цитаты"
     quote_id = int(args[0])
 
-    await quotes_db.delete_quote_by_id(quote_id)
+    await quotes_db.delete_quote_by_id(message.peer_id, quote_id)
     return "Понял"
