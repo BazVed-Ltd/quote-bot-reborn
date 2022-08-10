@@ -35,7 +35,7 @@ def get_fwd_messages(message: Message) -> list[Message]:
 async def attachment_to_dict(attachment: MessageAttachment) -> dict:
     result = {"downloaded": False}
 
-    a_type = attachment.type
+    a_type: MessageAttachmentType = attachment.type
     if a_type == MessageAttachmentType.PHOTO:
         result["filepath"] = await save_photo(attachment.photo)
         result["downloaded"] = True
@@ -50,6 +50,8 @@ async def attachment_to_dict(attachment: MessageAttachment) -> dict:
         result["filepath"] = attachment.audio_message.link_mp3
     else:
         raise TypeError("unsupported attachment type")
+
+    result["type"] = a_type.name.lower()
 
     return result
 
