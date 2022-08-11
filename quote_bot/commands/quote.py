@@ -40,7 +40,13 @@ async def fwd_message_to_dict(message: Message, from_reply=False, deep: int = -1
     else:
         result["fwd_messages"] = []
 
-    result["attachments"] = [await attachment_to_dict(attachment) for attachment in message.attachments]
+    result["attachments"] = []
+    for attachment in message.attachments:
+        try:
+            att = await attachment_to_dict(attachment)
+            result["attachments"].append(att)
+        except TypeError:
+            print("Не обработал")
     return result
 
 
